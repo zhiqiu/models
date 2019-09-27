@@ -236,7 +236,7 @@ def refresh_program(args,
             tensor = fluid.global_scope().find_var(var.name).get_tensor()
             if args.fp16:
                 tensor.set(np.array(
-                    kaiming_np, dtype="float16").view(np.uint16),
+                    kaiming_np, dtype="float16"),
                            place)
             else:
                 tensor.set(np.array(kaiming_np, dtype="float32"), place)
@@ -250,10 +250,7 @@ def refresh_program(args,
                 "float16" if args.fp16 else "float32").reshape((3, 1, 1))
         for vname, np_tensor in np_tensors.items():
             var = fluid.global_scope().find_var(vname)
-            if args.fp16:
-                var.get_tensor().set(np_tensor.view(np.uint16), place)
-            else:
-                var.get_tensor().set(np_tensor, place)
+            var.get_tensor().set(np_tensor, place)
 
     strategy = fluid.ExecutionStrategy()
     strategy.num_threads = args.num_threads
