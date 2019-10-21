@@ -14,7 +14,6 @@
 
 from __future__ import print_function
 
-import os
 import unittest
 import paddle.fluid as fluid
 import paddle.fluid.core as core
@@ -26,8 +25,9 @@ import numpy as np
 import six
 
 import reader
-import model_check
 import time
+import cProfile
+pr = cProfile.Profile()
 
 from args import *
 
@@ -216,6 +216,7 @@ class PtbModel(fluid.Layer):
 
         x_emb = self.embedding(input)
 
+        #print( self.x_emb.numpy() )
         x_emb = fluid.layers.reshape(
             x_emb, shape=[-1, self.num_steps, self.hidden_size])
         if self.dropout is not None and self.dropout > 0.0:
@@ -226,6 +227,7 @@ class PtbModel(fluid.Layer):
         rnn_out, last_hidden, last_cell = self.simple_lstm_rnn(x_emb, init_h,
                                                                init_c)
 
+        #print( "rnn_out", rnn_out.numpy() )
         rnn_out = fluid.layers.reshape(
             rnn_out, shape=[-1, self.num_steps, self.hidden_size])
         projection = fluid.layers.matmul(rnn_out, self.softmax_weight)
@@ -242,18 +244,14 @@ class PtbModel(fluid.Layer):
         return loss, last_hidden, last_cell
 
     def debug_emb(self):
+        #print("1111", self.x_emb.gradient() )
 
         np.save("emb_grad", self.x_emb.gradient())
 
 
 def train_ptb_lm():
+
     args = parse_args()
-
-    # check if set use_gpu=True in paddlepaddle cpu version
-    model_check.check_cuda(args.use_gpu)
-    # check if paddlepaddle version is satisfied
-    model_check.check_version()
-
     model_type = args.model_type
 
     vocab_size = 10000
@@ -325,15 +323,6 @@ def train_ptb_lm():
             num_steps=num_steps,
             init_scale=init_scale,
             dropout=dropout)
-
-        if args.init_from_pretrain_model:
-            if not os.path.exists(args.init_from_pretrain_model + '.pdparams'):
-                print(args.init_from_pretrain_model)
-                raise Warning("The pretrained params do not exist.")
-                return
-            fluid.load_dygraph(args.init_from_pretrain_model)
-            print("finish initing model from pretrained params from %s" %
-                  (args.init_from_pretrain_model))
 
         dy_param_updated = dict()
         dy_param_init = dict()
@@ -417,53 +406,62 @@ def train_ptb_lm():
             train_data_iter = reader.get_data_iter(train_data, batch_size,
                                                    num_steps)
 
+            init_hidden = to_variable(init_hidden_data)
+            init_cell = to_variable(init_cell_data)
             start_time = time.time()
+#            yep.start("origin_cuda.prof")
+            pr.enable()
             for batch_id, batch in enumerate(train_data_iter):
                 x_data, y_data = batch
                 x_data = x_data.reshape((-1, num_steps, 1))
                 y_data = y_data.reshape((-1, 1))
                 x = to_variable(x_data)
                 y = to_variable(y_data)
-                init_hidden = to_variable(init_hidden_data)
-                init_cell = to_variable(init_cell_data)
+                #init_hidden = to_variable(init_hidden_data)
+                #init_cell = to_variable(init_cell_data)
                 dy_loss, last_hidden, last_cell = ptb_model(x, y, init_hidden,
                                                             init_cell)
+                init_hidden = last_hidden
+                init_cell = last_cell
 
-                if origin:
-                    out_loss = dy_loss.numpy()
-                    init_hidden_data = last_hidden.numpy()
-                    init_cell_data = last_cell.numpy()
-                else:
-                    out_loss = framework._var_base_to_np(dy_loss)
-                    init_hidden_data = framework._var_base_to_np(last_hidden)
-                    init_cell_data = framework._var_base_to_np(last_cell)
+                #out_loss = dy_loss.numpy()
+
+                #init_hidden_data = last_hidden.numpy()
+                #init_cell_data = last_cell.numpy()
+
+                # total_loss += out_loss
+                # iters += num_steps
+
+                # if origin:
+                #     out_loss = dy_loss.numpy()
+                #     init_hidden_data = last_hidden.numpy()
+                #     init_cell_data = last_cell.numpy()
+                # else:
+                #     out_loss = framework._var_base_to_np(dy_loss)
+                #     init_hidden_data = framework._var_base_to_np(last_hidden)
+                #     init_cell_data = framework._var_base_to_np(last_cell)
 
                 dy_loss.backward()
-                sgd.minimize(dy_loss, grad_clip=grad_clip)
-                
-                
+                sgd.minimize(dy_loss, grad_clip=grad_clip)         
                 ptb_model.clear_gradients()
-                total_loss += out_loss
+                # total_loss += out_loss
                 iters += num_steps
 
-                if batch_id > 0 and batch_id % log_interval == 0:
-                    ppl = np.exp(total_loss / iters)
-                    print("-- Epoch:[%d]; Batch:[%d]; ppl: %.5f, lr: %.5f" %
-                          (epoch_id, batch_id, ppl[0],
-                           sgd._global_learning_rate().numpy()))
-
+#                if batch_id > 0 and batch_id % log_interval == 0:
+#                    ppl = np.exp(total_loss / iters)
+#                    print(epoch_id, "ppl ", batch_id, ppl[0], sgd._global_learning_rate().numpy())
+            print(framework._var_base_to_np(dy_loss))
+            pr.disable()
+            pr.dump_stats('mydev_cpr')
             print("one ecpoh finished", epoch_id)
             print("time cost ", time.time() - start_time)
-            ppl = np.exp(total_loss / iters)
-            print("-- Epoch:[%d]; ppl: %.5f" % (epoch_id, ppl[0]))
-            if args.ce:
-                print("kpis\ttrain_ppl\t%0.3f" % ppl[0])
-            save_model_dir = os.path.join(args.save_model_dir,
-                                          str(epoch_id), 'params')
-            fluid.save_dygraph(ptb_model.state_dict(), save_model_dir)
-            print("Saved model to: %s.\n" % save_model_dir)
+            break
+            # ppl = np.exp(total_loss / iters)
+            # print("ppl ", epoch_id, ppl[0])
+            # if args.ce:
+            #     print("kpis\ttrain_ppl\t%0.3f" % ppl[0])
 
-        eval(ptb_model, test_data)
+        #eval(ptb_model, test_data)
 
 
 train_ptb_lm()
