@@ -1,11 +1,15 @@
 import os
+<<<<<<< HEAD
 import signal
+=======
+>>>>>>> 04b036cdd0aa9e149285718c90371062a651f891
 import sys
 
 import dataflow as df
 import numpy as np
 
 
+<<<<<<< HEAD
 # handle terminate reader process, do not print stack frame
 def _reader_quit(signum, frame):
     print("Reader process exit.")
@@ -22,6 +26,8 @@ signal.signal(signal.SIGTERM, _reader_quit)
 signal.signal(signal.SIGINT, _term_group)
 
 
+=======
+>>>>>>> 04b036cdd0aa9e149285718c90371062a651f891
 class LTRLoader(df.DataFlow):
     """
     Data loader. Combines a dataset and a sampler, and provides

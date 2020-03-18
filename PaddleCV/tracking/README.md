@@ -69,10 +69,19 @@ Datasets是数据集保存的路径。
 ## 快速开始
 
 tracking的工作环境：
+<<<<<<< HEAD
 - python3
 - PaddlePaddle1.7
 
 > 注意：如果遇到cmath无法import的问题，建议切换Python版本，建议使用python3.6.8, python3.7.0
+=======
+- Linux
+- python3
+- PaddlePaddle1.7
+
+> 注意：如果遇到cmath无法import的问题，建议切换Python版本，建议使用python3.6.8, python3.7.0 。另外，
+> tracking暂不支持在window上运行，如果开发者有需求在window上运行tracking，请在issue中提出需求。
+>>>>>>> 04b036cdd0aa9e149285718c90371062a651f891
 
 ### 安装依赖
 
@@ -262,8 +271,13 @@ jupyter notebook --ip 0.0.0.0 --port 8888
 
 | 数据集 | 模型 | Backbone | 论文结果 | 训练结果 | 模型|
 | :-------: | :-------: | :---: | :---: | :---------: |:---------: |
+<<<<<<< HEAD
 |VOT2018| ATOM | Res18 |  EAO: 0.401 | 0.399 | [model]() |
 |VOT2018| ATOM | AlexNet |  EAO: 0.188 | 0.211 | [model]() |
+=======
+|VOT2018| ATOM | Res18 |  EAO: 0.401 | 0.399 | [model](https://paddlemodels.cdn.bcebos.com/paddle_track/vot/ATOM.tar) |
+|VOT2018| SiamFC | AlexNet |  EAO: 0.188 | 0.211 | [model](https://paddlemodels.cdn.bcebos.com/paddle_track/vot/SiamFC.tar) |
+>>>>>>> 04b036cdd0aa9e149285718c90371062a651f891
 
 ## 引用与参考
 
