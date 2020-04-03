@@ -13,7 +13,7 @@ PaddlePaddle 提供了丰富的计算单元，使得用户可以采用模块化�
   * [图像生成](#图像生成)
   * [场景文字识别](#场景文字识别)
   * [度量学习](#度量学习)
-  * [视频分类和动作定位](#视频分类和动作定位)
+  * [视频](#视频)
 * [智能文本处理(PaddleNLP)](#PaddleNLP)
   * [NLP 基础技术](#NLP-基础技术)
   * [NLP 核心技术](#NLP-核心技术)
@@ -71,15 +71,20 @@ PaddlePaddle 提供了丰富的计算单元，使得用户可以采用模块化�
 ### 图像分割
 
 图像语义分割顾名思义是将图像像素按照表达的语义含义的不同进行分组/分割，图像语义是指对图像内容的理解，例如，能够描绘出什么物体在哪里做了什么事情等，分割是指对图片中的每个像素点进行标注，标注属于哪一类别。近年来用在无人车驾驶技术中分割街景来避让行人和车辆、医疗影像分析中辅助诊断等。
+图像语义分割模型请参考语义分割库[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)
 
 | 模型名称                                                     | 模型简介                                                     | 数据集    | 评估指标        |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | --------- | --------------- |
-| [ICNet](https://github.com/PaddlePaddle/PaddleSeg) | 主要用于图像实时语义分割，能够兼顾速度和准确性，易于线上部署 | Cityscapes | Mean IoU=67.0%  |
-| [DeepLab V3+](https://github.com/PaddlePaddle/PaddleSeg) | 通过 encoder-decoder 进行多尺度信息的融合，同时保留了原来的空洞卷积和 ASSP 层，   其骨干网络使用了 Xception 模型，提高了语义分割的健壮性和运行速率 | Cityscapes | Mean IoU=78.81% |
-| [PSPNet (res101)](https://github.com/PaddlePaddle/Research/tree/master/CV/SemSegPaddle) | 通过利用不同子区域和全局的上下文信息来增强语义分割质量，同时提出deeply supervised 的辅助loss去改善模型的优化 | Cityscapes | Mean IoU = 78.1 |
-| [GloRe (res101)](https://github.com/PaddlePaddle/Research/tree/master/CV/SemSegPaddle) | 提出一个轻量级的、可端到端训练的全局推理单元GloRe来高效推理image regions之间的关系，增强了模型上下文建模能力| Cityscapes | Mean IoU = 78.4 |
-| [PSPNet (res101)](https://github.com/PaddlePaddle/Research/tree/master/CV/SemSegPaddle) | -| PASCAL Context | Mean IoU = 48.9  |
-| [GloRe (res101)](https://github.com/PaddlePaddle/Research/tree/master/CV/SemSegPaddle) | -| PASCAL Context | Mean IoU = 48.4 |
+| [U-Net](https://github.com/PaddlePaddle/PaddleSeg/blob/release/v0.4.0/turtorial/finetune_unet.md) |起源于医疗图像分割，整个网络是标准的encoder-decoder网络，特点是参数少，计算快，应用性强，对于一般场景适应度很高。U-Net最早于2015年提出，并在ISBI 2015 Cell Tracking Challenge取得了第一。经过发展，目前有多个变形和应用。| -- | -- |
+| [ICNet](https://github.com/PaddlePaddle/PaddleSeg/blob/release/v0.4.0/turtorial/finetune_icnet.md) | 主要用于图像实时语义分割，能够兼顾速度和准确性，易于线上部署。 | Cityscapes | Mean IoU=68.31%  |
+| [PSPNet](https://github.com/PaddlePaddle/PaddleSeg/blob/release/v0.4.0/turtorial/finetune_pspnet.md) | 起源于场景解析(Scene Parsing)领域。通过特殊设计的全局均值池化操作（global average pooling）和特征融合构造金字塔池化模块 (Pyramid Pooling Module)，来融合图像中不同区域的上下文信息。 | Cityscapes | Mean IoU=77.34% |
+| [DeepLabv3+](https://github.com/PaddlePaddle/PaddleSeg/blob/release/v0.4.0/turtorial/finetune_deeplabv3plus.md) | 通过 encoder-decoder 进行多尺度信息的融合，同时保留了原来的空洞卷积和 ASSP 层，其骨干网络使用了 Xception 模型，提高了语义分割的健壮性和运行速率。 | Cityscapes | Mean IoU=79.30% |
+| [HRNet](https://github.com/PaddlePaddle/PaddleSeg/blob/release/v0.4.0/turtorial/finetune_hrnet.md) | 在整个训练过程中始终维持高分辨率表示。 通过两个特性学习到更丰富的语义信息和细节信息：（1）从高分辨率到低分辨率并行连接各子网络，（2）反复交换跨分辨率子网络信息。 在人体姿态估计、语义分割和目标检测领域都取得了显著的性能提升。 | Cityscapes | Mean IoU=79.36% |
+| [Fast-SCNN](https://github.com/PaddlePaddle/PaddleSeg/blob/release/v0.4.0/turtorial/finetune_fast_scnn.md) | 一个面向实时的语义分割网络。在双分支的结构基础上，大量使用了深度可分离卷积和逆残差（inverted-residual）模块，并且使用特征融合构造金字塔池化模块 (Pyramid Pooling Module)来融合上下文信息。这使得Fast-SCNN在保持高效的情况下能学习到丰富的细节信息。 | Cityscapes | Mean IoU=69.64% |
+| [PSPNet (res101)](https://github.com/PaddlePaddle/Research/tree/master/CV/SemSegPaddle) | 通过利用不同子区域和全局的上下文信息来增强语义分割质量，同时提出deeply supervised 的辅助loss去改善模型的优化 | Cityscapes | Mean IoU=78.1% |
+| [GloRe (res101)](https://github.com/PaddlePaddle/Research/tree/master/CV/SemSegPaddle) | 提出一个轻量级的、可端到端训练的全局推理单元GloRe来高效推理image regions之间的关系，增强了模型上下文建模能力| Cityscapes | Mean IoU=78.4% |
+| [PSPNet (res101)](https://github.com/PaddlePaddle/Research/tree/master/CV/SemSegPaddle) | -| PASCAL Context | Mean IoU=48.9  |
+| [GloRe (res101)](https://github.com/PaddlePaddle/Research/tree/master/CV/SemSegPaddle) | -| PASCAL Context | Mean IoU=48.4 |
 
 ### 关键点检测
 
@@ -125,31 +130,49 @@ PaddlePaddle 提供了丰富的计算单元，使得用户可以采用模块化�
 | [ResNet50使用eml微调](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/metric_learning) | 在 arcmargin loss 基础上，使用 eml loss 微调的特征模型       | Stanford   Online Product(SOP) | 80.11%                                      |
 | [ResNet50使用npairs微调](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/metric_learning) | 在 arcmargin loss基础上，使用npairs loss 微调的特征模型      | Stanford   Online Product(SOP) | 79.81%                                      |
 
-### 视频分类和动作定位
 
-视频分类和动作定位是视频理解任务的基础。视频数据包含语音、图像等多种信息，因此理解视频任务不仅需要处理语音和图像，还需要提取视频帧时间序列中的上下文信息。视频分类模型提供了提取全局时序特征的方法，主要方式有卷积神经网络 (C3D, I3D, C2D等)，神经网络和传统图像算法结合 (VLAD 等)，循环神经网络等建模方法。视频动作定位模型需要同时识别视频动作的类别和起止时间点，通常采用类似于图像目标检测中的算法在时间维度上进行建模。
+### 视频
+
+PaddleCV全面开源了视频分类、动作定位 和 目标跟踪等视频任务的领先实用算法。视频数据包含语音、图像等多种信息，因此理解视频任务不仅需要处理语音和图像，还需要提取视频帧时间序列中的上下文信息。
+视频分类模型提供了提取全局时序特征的方法，主要方式有卷积神经网络 (C3D, I3D, C2D等)，神经网络和传统图像算法结合 (VLAD 等)，循环神经网络等建模方法。
+视频动作定位模型需要同时识别视频动作的类别和起止时间点，通常采用类似于图像目标检测中的算法在时间维度上进行建模。
+视频摘要生成模型是对视频画面信息进行提取，并产生一段文字描述。视频查找模型则是基于一段文字描述，查找到视频中对应场景片段的起止时间点。这两类模型需要同时对视频图像和文本信息进行建模。
+目标跟踪任务是在给定某视频序列中找到目标物体，并将不同帧中的物体一一对应，然后给出不同物体的运动轨迹，目标跟踪的主要应用在视频监控、人机交互等系统中。跟踪又分为单目标跟踪和多目标跟踪，当前在飞桨模型库中增加了单目标跟踪的算法。主要包括Siam系列算法和ATOM算法。
 
 | 模型名称                                                     | 模型简介                                                     | 数据集                     | 评估指标    |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------- | ----------- |
-| [TSN](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | ECCV'16 提出的基于 2D-CNN 经典解决方案 | Kinetics-400               | Top-1 = 67% |
-| [Non-Local](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | 视频非局部关联建模模型 | Kinetics-400               | Top-1 = 74% |
-| [StNet](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | AAAI'19 提出的视频联合时空建模方法 | Kinetics-400               | Top-1 = 69% |
-| [TSM](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | 基于时序移位的简单高效视频时空建模方法 | Kinetics-400               | Top-1 = 70% |
-| [Attention   LSTM](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | 常用模型，速度快精度高 | Youtube-8M                 | GAP   = 86% |
-| [Attention   Cluster](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | CVPR'18 提出的视频多模态特征注意力聚簇融合方法 | Youtube-8M                 | GAP   = 84% |
-| [NeXtVlad](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | 2nd-Youtube-8M 比赛第 3 名的模型 | Youtube-8M                 | GAP   = 87% |
-| [C-TCN](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | 2018 年 ActivityNet 夺冠方案 | ActivityNet1.3 | MAP=31%    |
-| [BSN](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | 为视频动作定位问题提供高效的 proposal 生成方法 | ActivityNet1.3 | AUC=66.64%    |
-| [BMN](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video) | 2019 年 ActivityNet 夺冠方案 | ActivityNet1.3 | AUC=67.19%    |
-| [ETS](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video/models/ets) | 视频摘要生成领域的基准模型 | ActivityNet Captions | METEOR：10.0 |
-| [TALL](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleCV/video/models/tall) | 视频Grounding方向的BaseLine模型 | TACoS | R1@IOU5=0.13 |
+| [TSN](./PaddleCV/video) | ECCV'16 提出的基于 2D-CNN 经典解决方案 | Kinetics-400               | Top-1 = 67% |
+| [Non-Local](./PaddleCV/video) | 视频非局部关联建模模型 | Kinetics-400               | Top-1 = 74% |
+| [StNet](./PaddleCV/video) | AAAI'19 提出的视频联合时空建模方法 | Kinetics-400               | Top-1 = 69% |
+| [TSM](./PaddleCV/video) | 基于时序移位的简单高效视频时空建模方法 | Kinetics-400               | Top-1 = 70% |
+| [Attention   LSTM](./PaddleCV/video) | 常用模型，速度快精度高 | Youtube-8M                 | GAP   = 86% |
+| [Attention   Cluster](./PaddleCV/video) | CVPR'18 提出的视频多模态特征注意力聚簇融合方法 | Youtube-8M                 | GAP   = 84% |
+| [NeXtVlad](./PaddleCV/video) | 2nd-Youtube-8M 比赛第 3 名的模型 | Youtube-8M                 | GAP   = 87% |
+| [C-TCN](./PaddleCV/video) | 2018 年 ActivityNet 夺冠方案 | ActivityNet1.3 | MAP=31%    |
+| [BSN](./PaddleCV/video) | 为视频动作定位问题提供高效的 proposal 生成方法 | ActivityNet1.3 | AUC=66.64%    |
+| [BMN](./PaddleCV/video) | 2019 年 ActivityNet 夺冠方案 | ActivityNet1.3 | AUC=67.19%    |
+| [ETS](./PaddleCV/video) | 视频摘要生成领域的基准模型 | ActivityNet Captions | METEOR：10.0 |
+| [TALL](./PaddleCV/video) | 视频Grounding方向的BaseLine模型 | TACoS | R1@IOU5=0.13 |
+| [SiamFC](./PaddleCV/tracking) | ECCV’16提出的全卷积神经网络视频跟踪模型 | VOT2018 | EAO = 0.211 |
+| [ATOM](./PaddleCV/tracking) | CVPR’19提出的两阶段目标跟踪模型 | VOT2018 | EAO = 0.399 |
+
+
+
+### 3D视觉
+
+计算机3D视觉技术是解决包含高度、宽度、深度三个方向信息的三维立体图像的分类、分割、检测、识别等任务的计算机技术，广泛地应用于如机器人、无人车、AR等领域。3D点云是3D图像数据的主要表达形式之一，基于3D点云的形状分类、语义分割、目标检测模型是3D视觉方向的基础任务。当前飞桨模型库开源了基于3D点云数据的用于分类、分割的PointNet++模型和用于检测的PointRCNN模型。
+
+| 模型名称                                                     | 模型简介                                                     | 数据集                     | 评估指标    |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------- | ----------- |
+| [PointNet++](https://github.com/PaddlePaddle/models/tree/develop/PaddleCV/3d_vision/PointNet++) | 改进的PointNet网络，加入局部特征提取提高模型泛化能力 | ModelNet40(分类) / Indoor3D(分割) | 分类：Top-1 = 90% / 分割：Top-1 = 86% |
+| [PointRCNN](https://github.com/PaddlePaddle/models/tree/develop/PaddleCV/3d_vision/PointRCNN) | 自下而上的3D检测框生成方法 | KITTI(Car) | 3D AP@70(easy/median/hard) = 86.66/76.65/75.90 |
 
 ## PaddleNLP
 
 [**PaddleNLP**](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP) 是基于 PaddlePaddle 深度学习框架开发的自然语言处理 (NLP) 工具，算法，模型和数据的开源项目。百度在 NLP 领域十几年的深厚积淀为 PaddleNLP 提供了强大的核心动力。使用 PaddleNLP，您可以得到：
 
 - **丰富而全面的 NLP 任务支持：**
-  - PaddleNLP 为您提供了多粒度，多场景的应用支持。涵盖了从[分词](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/lexical_analysis)，[词性标注](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/lexical_analysis)，[命名实体识别](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/lexical_analysis)等 NLP 基础技术，到[文本分类](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/sentiment_classification)，[文本相似度计算](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/similarity_net)，[语义表示](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/pretrain_langauge_models)，[文本生成](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/seq2seq)等 NLP 核心技术。同时，PaddleNLP 还提供了针对常见 NLP 大型应用系统（如[阅读理解](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/machine_reading_comprehension)，[对话系统](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/dialogue_system)，[机器翻译系统](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/machine_translation)等）的特定核心技术和工具组件，模型和预训练参数等，让您在 NLP 领域畅通无阻。
+  - PaddleNLP 为您提供了多粒度，多场景的应用支持。涵盖了从[分词](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/lexical_analysis)，[词性标注](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/lexical_analysis)，[命名实体识别](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/lexical_analysis)等 NLP 基础技术，到[文本分类](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/sentiment_classification)，[文本相似度计算](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/similarity_net)，[语义表示](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/pretrain_language_models)，[文本生成](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/seq2seq)等 NLP 核心技术。同时，PaddleNLP 还提供了针对常见 NLP 大型应用系统（如[阅读理解](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/machine_reading_comprehension)，[对话系统](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/dialogue_system)，[机器翻译系统](https://github.com/PaddlePaddle/models/tree/release/1.7/PaddleNLP/machine_translation)等）的特定核心技术和工具组件，模型和预训练参数等，让您在 NLP 领域畅通无阻。
 - **稳定可靠的 NLP 模型和强大的预训练参数：**
   - PaddleNLP集成了百度内部广泛使用的 NLP 工具模型，为您提供了稳定可靠的 NLP 算法解决方案。基于百亿级数据的预训练参数和丰富的预训练模型，助您轻松提高模型效果，为您的 NLP 业务注入强大动力。
 - **持续改进和技术支持，零基础搭建 NLP 应用：**
